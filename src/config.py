@@ -2,14 +2,16 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, SecretStr, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=ROOT / ".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=ROOT / ".env", extra="ignore", hide_input_in_errors=True
+    )
 
     database_url: SecretStr = SecretStr("postgresql://localhost/customer_intelligence")
     admin_database_url: SecretStr | None = None
@@ -26,6 +28,18 @@ class Settings(BaseSettings):
     sql_timeout_ms: int = Field(default=1500, ge=100, le=5000)
     model_timeout_seconds: float = Field(default=30, ge=1, le=60)
     max_tool_calls: int = Field(default=6, ge=1, le=10)
+
+    @field_validator(
+        "openai_api_key",
+        "reader_api_key",
+        "reviewer_api_key",
+        "admin_database_url",
+        "sql_database_url",
+        mode="before",
+    )
+    @classmethod
+    def empty_secret_is_unset(cls, value):
+        return None if isinstance(value, str) and not value.strip() else value
 
     @model_validator(mode="after")
     def validate_environment(self):
@@ -44,7 +58,13 @@ class Settings(BaseSettings):
             if self.business_date:
                 raise ValueError("BUSINESS_DATE overrides are for local/test demonstrations only")
             for url in (self.database_url, self.sql_database_url):
-                if not url or "sslmode=verify-full" not in url.get_secret_value():
+                from psycopg.conninfo import conninfo_to_dict
+
+                try:
+                    options = conninfo_to_dict(url.get_secret_value()) if url else {}
+                except Exception:
+                    raise ValueError("Invalid database connection configuration") from None
+                if options.get("sslmode") != "verify-full":
                     raise ValueError("Nonlocal database connections require sslmode=verify-full")
         return self
 

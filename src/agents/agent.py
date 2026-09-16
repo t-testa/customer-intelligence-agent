@@ -1,4 +1,5 @@
 import json
+import re
 from time import perf_counter
 
 from pydantic import Field
@@ -59,8 +60,13 @@ class CustomerAgent:
         messages = [{"role": "user", "content": question}]
         results: list[ToolResult] = []
         seen = set()
+        requested_ids = {
+            int(value) for value in re.findall(r"\bcustomer\s*#?\s*(\d+)\b", question, re.I)
+        }
         try:
             for _ in range(self.max_calls + 1):
+                if perf_counter() - start > 90:
+                    raise PolicyError("Agent time budget exceeded")
                 turn = self.provider.turn(messages, self.registry.schemas())
                 messages.extend(turn.output)
                 if not turn.calls:
@@ -72,6 +78,22 @@ class CustomerAgent:
                     if signature in seen:
                         raise PolicyError("Repeated tool call")
                     seen.add(signature)
+                    if len(requested_ids) == 1 and call.name in {
+                        "get_customer_by_id",
+                        "get_customer_risk",
+                        "search_customer_notes",
+                    }:
+                        try:
+                            arguments = json.loads(call.arguments)
+                        except ValueError as exc:
+                            raise PolicyError("Invalid tool JSON") from exc
+                        if (
+                            not isinstance(arguments, dict)
+                            or arguments.get("customer_id") not in requested_ids
+                        ):
+                            raise PolicyError(
+                                "Tool customer does not match the explicitly requested customer"
+                            )
                     data = self.registry.dispatch(call.name, call.arguments)
                     results.append(ToolResult(tool=call.name, data=data))
                     messages.append(
@@ -85,12 +107,15 @@ class CustomerAgent:
                 e["source_id"] for r in results if r.tool == "search_customer_notes" for e in r.data
             ]
             # Free-form model prose is deliberately never authoritative. Render typed tool facts.
+            only_missing_notes = bool(results) and all(
+                r.tool == "search_customer_notes" and not r.data for r in results
+            )
             return AgentAnswer(
                 answer=render_results(results)
-                if results
+                if results and not only_missing_notes
                 else "I cannot answer that from the approved customer tools.",
                 tools_used=[r.tool for r in results],
-                success=bool(results),
+                success=bool(results) and not only_missing_notes,
                 mode=self.provider.mode,
                 facts=results,
                 sources=list(dict.fromkeys(sources)),

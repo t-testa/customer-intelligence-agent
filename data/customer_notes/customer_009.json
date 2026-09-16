@@ -22,5 +22,29 @@
     "recorded_at": "2026-09-16",
     "text": "Expansion opportunity: analytics seats could grow once adoption milestones are met. Account manager will validate budget; no purchase commitment exists.",
     "synthetic": true
+  },
+  {
+    "note_id": "C009-billing",
+    "customer_id": 9,
+    "kind": "billing",
+    "recorded_at": "2026-09-16",
+    "text": "Billing review: invoice reconciliation completed. Finance requested purchase order references on future invoices and confirmed the payment schedule.",
+    "synthetic": true
+  },
+  {
+    "note_id": "C009-training",
+    "customer_id": 9,
+    "kind": "training",
+    "recorded_at": "2026-09-16",
+    "text": "Training plan: new administrators requested a workshop on permissions, dashboards and report exports. Enablement materials are being prepared.",
+    "synthetic": true
+  },
+  {
+    "note_id": "C009-executive",
+    "customer_id": 9,
+    "kind": "executive",
+    "recorded_at": "2026-09-16",
+    "text": "Positive sentiment: executive sponsor praised the collaboration and highlighted faster reporting for the operating team.",
+    "synthetic": true
   }
 ]

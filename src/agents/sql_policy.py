@@ -2,6 +2,8 @@
 
 import hashlib
 import json
+import logging
+import re
 
 import psycopg
 import sqlglot
@@ -11,6 +13,9 @@ from sqlglot.errors import ParseError
 
 from src.errors import PolicyError
 from src.observability.telemetry import Metrics, event
+
+# SQLGlot warnings may contain untrusted SQL text. Application logs emit metadata only.
+logging.getLogger("sqlglot").disabled = True
 
 TABLES = {"customers", "vw_customer_intelligence", "vw_customer_history", "vw_portfolio_trend"}
 NODES = {
@@ -65,6 +70,8 @@ def validate_sql(query: str, max_rows: int = 100) -> str:
     """No joins, CTEs, subqueries, casts, arbitrary functions, catalog or qualified access."""
     if not 1 <= max_rows <= 500 or not query.strip() or len(query) > 4000:
         raise PolicyError("Invalid query bounds")
+    if not re.match(r"^\s*SELECT\b", query, flags=re.I):
+        raise PolicyError("Only SELECT is permitted")
     # Conservative rejection also covers comment obfuscation and quoted semicolons.
     if any(token in query for token in (";", "--", "/*", "*/", "\\", "\x00")):
         raise PolicyError("Statement separators and comments are prohibited")
@@ -100,11 +107,21 @@ def validate_sql(query: str, max_rows: int = 100) -> str:
 
 
 class SqlExecutor:
-    def __init__(self, url: str | None, metrics: Metrics, max_rows=100, timeout_ms=1500):
+    def __init__(
+        self,
+        url: str | None,
+        metrics: Metrics,
+        max_rows=100,
+        timeout_ms=1500,
+        expected_role="cia_analyst",
+    ):
         self.url = url
         self.metrics = metrics
         self.max_rows = max_rows
         self.timeout_ms = timeout_ms
+        if expected_role not in {"cia_analyst", "cia_test_analyst"}:
+            raise ValueError("Invalid configured analyst role")
+        self.expected_role = expected_role
 
     def execute(self, query: str) -> dict:
         self.metrics.increment("sql_queries_total")
@@ -129,14 +146,24 @@ class SqlExecutor:
                 role = conn.execute(
                     "SELECT current_user AS name, rolsuper, rolcreaterole, rolcreatedb FROM pg_roles WHERE rolname=current_user"
                 ).fetchone()
-                if role["name"] != "cia_analyst" or any(
+                if role["name"] != self.expected_role or any(
                     role[k] for k in ("rolsuper", "rolcreaterole", "rolcreatedb")
                 ):
                     raise PolicyError("SQL connection must use the restricted cia_analyst role")
-                with conn.cursor(name="bounded_analytics") as cursor:
-                    cursor.execute(validated)
-                    rows = cursor.fetchmany(self.max_rows)
-                    columns = [c.name for c in cursor.description]
+                try:
+                    with conn.cursor(name="bounded_analytics") as cursor:
+                        cursor.execute(validated)
+                        rows = cursor.fetchmany(self.max_rows)
+                        columns = [c.name for c in cursor.description]
+                except (
+                    psycopg.ProgrammingError,
+                    psycopg.DataError,
+                    psycopg.errors.QueryCanceled,
+                    psycopg.errors.LockNotAvailable,
+                ) as exc:
+                    self.metrics.increment("errors_total")
+                    event("sql_execution", success=False, error_type=type(exc).__name__)
+                    raise PolicyError("SQL execution rejected or exceeded resource limits") from exc
         if len(json.dumps(rows, default=str).encode()) > 128_000:
             raise PolicyError("Result exceeds byte budget")
         event("sql_execution", success=True, rows=len(rows))

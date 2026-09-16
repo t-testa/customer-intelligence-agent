@@ -1,6 +1,7 @@
 """Apply versioned SQL files once; seed only on explicit request."""
 
 import argparse
+import hashlib
 
 from src.config import ROOT, Settings
 from src.database import Database
@@ -13,13 +14,26 @@ def initialize(db: Database, seed: bool = False):
         conn.execute(
             "CREATE TABLE IF NOT EXISTS schema_migrations (version TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())"
         )
+        conn.execute("ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS checksum TEXT")
         for path in sorted((ROOT / "sql").glob("[0-9][0-9][0-9]_*.sql")):
+            content = path.read_text(encoding="utf-8")
+            checksum = hashlib.sha256(content.encode()).hexdigest()
             exists = conn.execute(
-                "SELECT 1 FROM schema_migrations WHERE version = %s", (path.name,)
+                "SELECT checksum FROM schema_migrations WHERE version = %s", (path.name,)
             ).fetchone()
+            if exists and exists["checksum"] not in (None, checksum):
+                raise ValueError("Applied migration was modified; create a new numbered migration")
             if not exists:
-                conn.execute(path.read_text(encoding="utf-8"))
-                conn.execute("INSERT INTO schema_migrations(version) VALUES (%s)", (path.name,))
+                conn.execute(content)
+                conn.execute(
+                    "INSERT INTO schema_migrations(version,checksum) VALUES (%s,%s)",
+                    (path.name, checksum),
+                )
+            elif exists["checksum"] is None:
+                conn.execute(
+                    "UPDATE schema_migrations SET checksum=%s WHERE version=%s",
+                    (checksum, path.name),
+                )
         if seed:
             for customer in load_customers(ROOT / "data/customers.csv"):
                 conn.execute(

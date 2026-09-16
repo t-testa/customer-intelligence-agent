@@ -1,0 +1,12 @@
+[
+  {"query":"unresolved data import defects blocking adoption", "customer_id":3, "source":"C003-support#0"},
+  {"query":"invoice reconciliation purchase order payment schedule", "customer_id":3, "source":"C003-billing#0"},
+  {"query":"administrators workshop permissions report exports", "customer_id":8, "source":"C008-training#0"},
+  {"query":"procurement written success plan contract review", "customer_id":8, "source":"C008-renewal#0"},
+  {"query":"analytics seats grow budget commitment", "customer_id":12, "source":"C012-expansion#0"},
+  {"query":"executive sponsor praised faster reporting", "customer_id":12, "source":"C012-executive#0"},
+  {"query":"onboarding completed stable integrations responsive support", "customer_id":20, "source":"C020-support#0"},
+  {"query":"leadership measurable adoption ownership milestones", "customer_id":23, "source":"C023-executive#0"},
+  {"query":"new administrators enablement materials workshop", "customer_id":33, "source":"C033-training#0"},
+  {"query":"sponsor satisfaction next quarter planning", "customer_id":40, "source":"C040-renewal#0"}
+]

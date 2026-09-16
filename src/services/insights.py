@@ -36,7 +36,15 @@ def validate_narrative(raw, evidence: list[Evidence]) -> InsightNarrative:
     if not set(narrative.source_ids) <= known or (known and not narrative.source_ids):
         raise ModelError("Narrative cites unsupported evidence")
     for text in [narrative.executive_summary, *narrative.recommended_actions]:
-        if len(text) > 1800 or re.search(r"\d|[$€£]|\b(?:high|medium|low)[ -]risk\b", text, re.I):
+        if (
+            not text.strip()
+            or len(text) > 1800
+            or re.search(
+                r"\d|[$€£]|\b(?:high|medium|low)[ -]risk\b|\b(?:dollars?|percent|million|billion)\b",
+                text,
+                re.I,
+            )
+        ):
             raise ModelError("Narrative must not restate authoritative quantitative facts")
     return narrative
 

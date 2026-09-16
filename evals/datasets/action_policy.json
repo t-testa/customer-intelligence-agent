@@ -1,0 +1,18 @@
+[
+ {"from":"PENDING","to":"PENDING","allowed":false},
+ {"from":"PENDING","to":"APPROVED","allowed":true},
+ {"from":"PENDING","to":"REJECTED","allowed":true},
+ {"from":"PENDING","to":"EXECUTED","allowed":false},
+ {"from":"APPROVED","to":"PENDING","allowed":false},
+ {"from":"APPROVED","to":"APPROVED","allowed":false},
+ {"from":"APPROVED","to":"REJECTED","allowed":false},
+ {"from":"APPROVED","to":"EXECUTED","allowed":true},
+ {"from":"REJECTED","to":"PENDING","allowed":false},
+ {"from":"REJECTED","to":"APPROVED","allowed":false},
+ {"from":"REJECTED","to":"REJECTED","allowed":false},
+ {"from":"REJECTED","to":"EXECUTED","allowed":false},
+ {"from":"EXECUTED","to":"PENDING","allowed":false},
+ {"from":"EXECUTED","to":"APPROVED","allowed":false},
+ {"from":"EXECUTED","to":"REJECTED","allowed":false},
+ {"from":"EXECUTED","to":"EXECUTED","allowed":false}
+]

@@ -1,6 +1,7 @@
 import os
 from datetime import date
 
+import openai
 import pytest
 from psycopg.conninfo import conninfo_to_dict
 
@@ -8,6 +9,32 @@ from scripts.init_db import initialize
 from src.config import ROOT
 from src.database import Database
 from src.services.data import load_customers
+
+REAL_OPENAI_INIT = openai.OpenAI.__init__
+
+
+@pytest.fixture
+def sdk_client_factory():
+    """Real SDK serialization on a MockTransport; no network or paid calls possible."""
+    import httpx
+
+    clients = []
+
+    def create(handler):
+        transport = httpx.MockTransport(handler)
+        client = openai.OpenAI.__new__(openai.OpenAI)
+        REAL_OPENAI_INIT(
+            client,
+            api_key="synthetic-sdk-test-key",
+            http_client=httpx.Client(transport=transport),
+            max_retries=0,
+        )
+        clients.append(client)
+        return client
+
+    yield create
+    for client in clients:
+        client.close()
 
 
 @pytest.fixture

@@ -52,6 +52,24 @@ def main():
                 "Expansion opportunity: analytics seats could grow once adoption milestones are met. Account manager will validate budget; no purchase commitment exists.",
             ),
         ]
+        entries.extend(
+            [
+                (
+                    "billing",
+                    "Billing review: invoice reconciliation completed. Finance requested purchase order references on future invoices and confirmed the payment schedule.",
+                ),
+                (
+                    "training",
+                    "Training plan: new administrators requested a workshop on permissions, dashboards and report exports. Enablement materials are being prepared.",
+                ),
+                (
+                    "executive",
+                    "Executive check-in: leadership wants measurable adoption outcomes and clearer ownership of implementation milestones."
+                    if high
+                    else "Positive sentiment: executive sponsor praised the collaboration and highlighted faster reporting for the operating team.",
+                ),
+            ]
+        )
         notes = [
             dict(
                 note_id=f"C{i:03d}-{kind}",
@@ -71,7 +89,7 @@ def main():
         writer.writeheader()
         writer.writerows(records)
     (directory / "README.md").write_text(
-        "# Synthetic data\n\n40 fictional customers and 120 fictional notes. No real customer data. Dates are anchored to 2026-09-16; set BUSINESS_DATE for a repeatable demo or regenerate deliberately. Currency: CAD. NPS is a synthetic account-level proxy, not a statistically estimated survey NPS. Revenue is monthly recurring revenue. Tickets represent currently open tickets.\n",
+        "# Synthetic data\n\n40 fictional customers and 240 fictional notes across six topics. No real customer data. Dates are anchored to 2026-09-16; set BUSINESS_DATE for a repeatable demo or regenerate deliberately. Currency: CAD. NPS is a synthetic account-level proxy, not a statistically estimated survey NPS. Revenue is monthly recurring revenue. Tickets represent currently open tickets.\n",
         encoding="utf-8",
     )
 

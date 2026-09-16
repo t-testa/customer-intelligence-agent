@@ -41,6 +41,32 @@ def get_runtime(app):
         registry = customer_tools(
             app.state.customers, notes, sql, app.state.metrics, settings.today
         )
+        from src.agents.tools import EmptyArgs, Tool, TrendArgs
+        from src.repositories.analytics import AnalyticsRepository
+        from src.repositories.intelligence import EventRepository
+        from src.services.intelligence import EventStatus
+        from src.services.trends import TrendService
+
+        trends = TrendService(
+            app.state.customers, AnalyticsRepository(app.state.db), settings.today
+        )
+        events = EventRepository(app.state.db)
+        registry.register(
+            Tool(
+                "get_deteriorating_customers",
+                "Authoritative material deterioration against an exact historical baseline; no history means no inference",
+                TrendArgs,
+                trends.deteriorating,
+            )
+        )
+        registry.register(
+            Tool(
+                "get_open_intelligence_events",
+                "List persisted open customer intelligence events",
+                EmptyArgs,
+                lambda: events.list(EventStatus.OPEN),
+            )
+        )
         runtime = {
             "agent": CustomerAgent(provider, registry, app.state.metrics, settings.max_tool_calls),
             "insights": InsightService(app.state.customers, notes, provider, settings.today),

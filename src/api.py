@@ -99,7 +99,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.get("/metrics", response_model=dict[str, float], dependencies=secured, tags=["operations"])
     def metrics():
-        return app.state.metrics.snapshot()
+        from src.repositories.intelligence import EventRepository
+
+        return {**app.state.metrics.snapshot(), **EventRepository(app.state.db).scan_metrics()}
 
     @app.get("/customers/summary", response_model=Summary, dependencies=secured, tags=["customers"])
     def summary():
@@ -155,8 +157,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return get_runtime(app)["insights"].get(customer_id)
 
     from src.routes.actions import router as action_router
+    from src.routes.intelligence import router as intelligence_router
 
     app.include_router(action_router)
+    app.include_router(intelligence_router)
     return app
 
 
