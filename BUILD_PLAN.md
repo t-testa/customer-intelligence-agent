@@ -7,8 +7,8 @@ Baseline: `newtocode80/customer-intelligence-agent`, branch `main`, upstream `or
 | Phase | Deliverable | Acceptance evidence | Status |
 |---|---|---|---|
 | 0 | Plan, conventions, architecture | Documents exist before application code | Complete |
-| 1–2 | 40 synthetic customers; validation; PostgreSQL schema and repositories | Invalid data rejected, metrics correct, initialization idempotent | Pending |
-| 3–4 | Typed FastAPI and deterministic risk | DB health, 404/422 behavior, date boundaries tested | Pending |
+| 1–2 | 40 synthetic customers; validation; PostgreSQL schema and repositories | Invalid data rejected, metrics correct, initialization idempotent | Complete |
+| 3–4 | Typed FastAPI and deterministic risk | DB health, 404/422 behavior, date boundaries tested | Complete |
 | 5–6 | Allowlisted agent and constrained SQL | Mocked tool protocol, abstention, adversarial SQL and bounded execution tests | Pending |
 | 7–8 | Notes retrieval and typed insights | Customer filtering, cosine/top-k, source and authoritative-fact validation | Pending |
 | 9–10 | Persisted approvals, audit trail, logs and metrics | Complete transition matrix, concurrent execution, immutable payload, request IDs | Pending |
@@ -34,6 +34,8 @@ Baseline: `newtocode80/customer-intelligence-agent`, branch `main`, upstream `or
 - Baseline Git working tree was clean.
 - Python 3.12.14 found in the bundled workspace runtime. PostgreSQL 18 binaries are installed. Docker is not on PATH; container execution availability will be checked.
 - Official OpenAI function-calling, structured-output, and embedding documentation consulted before implementation.
+- Foundation: 23 tests passed, including real PostgreSQL 18 integration on an isolated loopback test instance. No production/local pre-existing database modified.
+- Environment approval allowed dependency installation and Git commits. PostgreSQL process startup required sandbox escalation; it now runs on port 55432.
 
 ## Logical commit sequence / fallback log
 
