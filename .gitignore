@@ -14,4 +14,7 @@ evals/results/*.json
 !evals/results/baseline.json
 !evals/results/.gitkeep
 *.log
+deployment-image.tar
+infra/*.json
+!infra/*.example.json
 .DS_Store

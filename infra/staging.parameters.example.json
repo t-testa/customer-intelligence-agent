@@ -1,0 +1,11 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentId": {"value": "/subscriptions/SUBSCRIPTION_ID/resourceGroups/RESOURCE_GROUP/providers/Microsoft.App/managedEnvironments/ENVIRONMENT_NAME"},
+    "identityId": {"value": "/subscriptions/SUBSCRIPTION_ID/resourceGroups/RESOURCE_GROUP/providers/Microsoft.ManagedIdentity/userAssignedIdentities/IDENTITY_NAME"},
+    "image": {"value": "REGISTRY.azurecr.io/customer-intelligence:COMMIT_SHA"},
+    "registryServer": {"value": "REGISTRY.azurecr.io"},
+    "vaultUrl": {"value": "https://VAULT_NAME.vault.azure.net"}
+  }
+}

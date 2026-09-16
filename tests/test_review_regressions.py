@@ -79,6 +79,30 @@ def test_failed_scan_is_recorded():
     assert recorded == [(0, 0, False)]
 
 
+def test_job_tls_and_money_tool_encoding():
+    from decimal import Decimal
+
+    from pydantic import ValidationError
+
+    from src.agents.tools import EmptyArgs
+    from src.config import Settings
+
+    with pytest.raises(ValidationError):
+        Settings(
+            _env_file=None,
+            require_database_tls=True,
+            database_url="postgresql://host/db?sslmode=disable",
+        )
+    assert Settings(
+        _env_file=None,
+        require_database_tls=True,
+        database_url="postgresql://host/db?sslmode=verify-full",
+    ).require_database_tls
+    registry = ToolRegistry(Metrics())
+    registry.register(Tool("money", "Money", EmptyArgs, lambda: {"mrr": Decimal("12345.67")}))
+    assert registry.dispatch("money", "{}")["mrr"] == "12345.67"
+
+
 @pytest.mark.integration
 def test_migration_checksum_rejects_edited_history(clean_db, tmp_path, monkeypatch):
     import scripts.init_db as module

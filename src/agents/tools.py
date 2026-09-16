@@ -1,6 +1,7 @@
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
+from decimal import Decimal
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import Field, ValidationError
@@ -73,7 +74,9 @@ class ToolRegistry:
             raise PolicyError("Invalid tool arguments") from exc
         self.metrics.increment("tool_calls_total")
         try:
-            result = jsonable_encoder(tool.execute(**args.model_dump()))
+            result = jsonable_encoder(
+                tool.execute(**args.model_dump()), custom_encoder={Decimal: str}
+            )
             if len(json.dumps(result).encode()) > 128_000:
                 raise PolicyError("Tool output budget exceeded")
             event("tool_call", tool=name, success=True)

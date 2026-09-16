@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     reader_api_key: SecretStr | None = None
     reviewer_api_key: SecretStr | None = None
     business_date: date | None = None
+    require_database_tls: bool = False
     sql_max_rows: int = Field(default=100, ge=1, le=500)
     sql_timeout_ms: int = Field(default=1500, ge=100, le=5000)
     model_timeout_seconds: float = Field(default=30, ge=1, le=60)
@@ -57,7 +58,13 @@ class Settings(BaseSettings):
                 raise ValueError("Reader and reviewer credentials must differ")
             if self.business_date:
                 raise ValueError("BUSINESS_DATE overrides are for local/test demonstrations only")
-            for url in (self.database_url, self.sql_database_url):
+        if self.require_database_tls or self.app_env in {"staging", "production"}:
+            urls = [self.database_url]
+            if self.app_env in {"staging", "production"} or self.sql_database_url:
+                urls.append(self.sql_database_url)
+            if self.admin_database_url:
+                urls.append(self.admin_database_url)
+            for url in urls:
                 from psycopg.conninfo import conninfo_to_dict
 
                 try:
