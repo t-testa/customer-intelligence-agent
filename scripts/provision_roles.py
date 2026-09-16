@@ -2,9 +2,10 @@
 
 import os
 
+from dotenv import dotenv_values
 from psycopg import sql
 
-from src.config import Settings
+from src.config import ROOT, Settings
 from src.database import Database
 
 
@@ -91,10 +92,11 @@ def main():
     settings = Settings()
     if not settings.admin_database_url:
         raise ValueError("ADMIN_DATABASE_URL is required for provisioning")
+    local = dotenv_values(ROOT / ".env")
     provision(
         Database(settings.admin_database_url.get_secret_value()),
-        os.environ["APP_DB_PASSWORD"],
-        os.environ["ANALYST_DB_PASSWORD"],
+        os.environ.get("APP_DB_PASSWORD") or local.get("APP_DB_PASSWORD", ""),
+        os.environ.get("ANALYST_DB_PASSWORD") or local.get("ANALYST_DB_PASSWORD", ""),
     )
     print("Restricted runtime, SQL and BI privileges provisioned")
 
