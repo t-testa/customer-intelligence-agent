@@ -1,0 +1,16 @@
+// Add each measure separately to the Current table.
+Total Customers = COUNTROWS('Current')
+Total MRR = SUM('Current'[monthly_revenue])
+High-Risk Customers = CALCULATE([Total Customers], 'Current'[risk_level] = "HIGH")
+High-Risk MRR = COALESCE(CALCULATE([Total MRR], 'Current'[risk_level] = "HIGH"), 0)
+Average NPS = AVERAGE('Current'[nps_score])
+High-Risk MRR Share = DIVIDE([High-Risk MRR], [Total MRR])
+Pending Actions = SUM('Current'[pending_actions])
+Approved Actions = SUM('Current'[approved_actions])
+Last Snapshot UTC = MAX('Current'[snapshot_timestamp])
+
+// Add these to History and use Date[snapshot_date] on time axes.
+Historical MRR = SUM('History'[monthly_revenue])
+Historical High-Risk MRR = COALESCE(CALCULATE([Historical MRR], 'History'[risk_level] = "HIGH"), 0)
+Historical Average Risk = AVERAGE('History'[risk_score])
+Historical Average NPS = AVERAGE('History'[nps_score])

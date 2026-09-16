@@ -1,0 +1,13 @@
+{
+  "artifact_type": "power-bi-authoring-specification",
+  "is_authored_pbip": false,
+  "title": "Customer Intelligence — Synthetic Portfolio",
+  "mode": "Import",
+  "currency": "CAD",
+  "sources": ["vw_customer_intelligence", "vw_customer_history", "vw_portfolio_trend"],
+  "pages": [
+    {"title":"Portfolio", "cards":["Total Customers","Total MRR","High-Risk Customers","High-Risk MRR","Average NPS"], "slicers":["industry","risk_level"], "visuals":["Risk distribution","MRR by industry","Prioritized accounts with pending and approved actions"], "footer":"Synthetic data · Snapshot time in UTC · Rule version"},
+    {"title":"Trends", "slicers":["snapshot_date","customer_id"], "visuals":["High-risk MRR over time","Average risk and NPS over time","Customer risk trajectory"], "missing_dates":"Show gaps; do not replace missing history with zero"}
+  ],
+  "quality_checks": ["One current row per customer", "Unique customer/date history", "No risk scoring in DAX", "Compare MRR to deterministic API", "Show last snapshot timestamp"]
+}

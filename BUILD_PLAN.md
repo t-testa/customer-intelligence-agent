@@ -16,7 +16,7 @@ Baseline: `newtocode80/customer-intelligence-agent`, branch `main`, upstream `or
 | 15 | Independent deterministic/live evaluation harness | All five deterministic gates pass; live API execution remains opt-in | Complete; live quality unmeasured |
 | 16–17 | Current/daily BI snapshots and curated views | Authoritative risk reuse, one row/customer/day, idempotent upsert | Complete |
 | 18–19 | Trends and deduplicated persistent events | Fixed-date trend tests, concurrent dedupe, lifecycle, scheduled job template | Complete locally; Azure job not deployed |
-| Final | Full validation and consultant review | Review fixes and final verification in progress | In progress |
+| Final | Full validation and consultant review | 120 tests, 95.54% coverage, all deterministic gates, lint/templates/workflows verified | Complete locally; listed external checks remain |
 
 ## Architecture and execution decisions
 
@@ -53,6 +53,9 @@ Baseline: `newtocode80/customer-intelligence-agent`, branch `main`, upstream `or
 - Failed scans are durably recorded when the database is reachable; partial event creation is safe to retry because uniqueness is database-enforced.
 - Restricted INSERT column privileges prevent the runtime role from creating already-executed actions; update privileges and triggers protect immutable payloads.
 - Expanded the RAG corpus to six topics/account so Hit@3 is not trivial retrieval over only three candidates.
+- CD now promotes the saved image artifact from the exact successful CI run instead of rebuilding a potentially different image at deployment time.
+- Final verification: **120 passed, 0 failed, 0 skipped; 95.54% source statement coverage**. Two third-party Starlette deprecation warnings remain (httpx/AnyIO compatibility), with no application warning or failing path.
+- Final evaluation baseline saved in `evals/results/baseline.json`. Ruff, format check, Bash syntax check, actionlint, Bicep compilation, local documentation link checks and Git whitespace checks passed.
 
 ## Logical commit sequence / fallback log
 
