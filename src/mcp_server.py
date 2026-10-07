@@ -4,7 +4,6 @@ from src.config import Settings
 from src.database import Database
 from src.repositories.customers import CustomerRepository
 
-
 settings = Settings()
 
 database = Database(settings.database_url.get_secret_value())

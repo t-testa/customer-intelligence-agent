@@ -5,7 +5,6 @@ from pathlib import Path
 
 from mcp import Client, StdioServerParameters
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
