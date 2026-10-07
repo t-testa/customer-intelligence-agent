@@ -1,0 +1,8 @@
+fastapi>=0.115,<1
+uvicorn>=0.34,<1
+psycopg[binary]>=3.2,<4
+pydantic>=2.10,<3
+pydantic-settings>=2.7,<3
+openai>=1.68,<3
+numpy>=2.2,<3
+sqlglot>=26,<30

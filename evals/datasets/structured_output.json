@@ -1,0 +1,16 @@
+[
+ {"patch":{}, "allowed":true},
+ {"patch":{"confidence":0}, "allowed":true},
+ {"patch":{"confidence":1}, "allowed":true},
+ {"patch":{"confidence":-0.1}, "allowed":false},
+ {"patch":{"confidence":1.01}, "allowed":false},
+ {"patch":{"source_ids":["C004-support#0"]}, "allowed":false},
+ {"patch":{"source_ids":[]}, "allowed":false},
+ {"patch":{"executive_summary":""}, "allowed":false},
+ {"patch":{"executive_summary":"MRR is $999999"}, "allowed":false},
+ {"patch":{"executive_summary":"This is a LOW-RISK account"}, "allowed":false},
+ {"patch":{"recommended_actions":[]}, "allowed":false},
+ {"patch":{"risk_level":"LOW"}, "allowed":false},
+ {"patch":{"customer_id":999}, "allowed":false},
+ {"patch":{"recommended_actions":["Send 100 emails"]}, "allowed":false}
+]

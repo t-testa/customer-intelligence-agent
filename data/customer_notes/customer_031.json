@@ -1,0 +1,50 @@
+[
+  {
+    "note_id": "C031-renewal",
+    "customer_id": 31,
+    "kind": "renewal",
+    "recorded_at": "2026-09-16",
+    "text": "Renewal discussion: sponsor confirmed satisfaction and requested next quarter planning.",
+    "synthetic": true
+  },
+  {
+    "note_id": "C031-support",
+    "customer_id": 31,
+    "kind": "support",
+    "recorded_at": "2026-09-16",
+    "text": "Support summary: onboarding completed successfully. The team praised responsive support and stable integrations.",
+    "synthetic": true
+  },
+  {
+    "note_id": "C031-expansion",
+    "customer_id": 31,
+    "kind": "expansion",
+    "recorded_at": "2026-09-16",
+    "text": "Expansion opportunity: analytics seats could grow once adoption milestones are met. Account manager will validate budget; no purchase commitment exists.",
+    "synthetic": true
+  },
+  {
+    "note_id": "C031-billing",
+    "customer_id": 31,
+    "kind": "billing",
+    "recorded_at": "2026-09-16",
+    "text": "Billing review: invoice reconciliation completed. Finance requested purchase order references on future invoices and confirmed the payment schedule.",
+    "synthetic": true
+  },
+  {
+    "note_id": "C031-training",
+    "customer_id": 31,
+    "kind": "training",
+    "recorded_at": "2026-09-16",
+    "text": "Training plan: new administrators requested a workshop on permissions, dashboards and report exports. Enablement materials are being prepared.",
+    "synthetic": true
+  },
+  {
+    "note_id": "C031-executive",
+    "customer_id": 31,
+    "kind": "executive",
+    "recorded_at": "2026-09-16",
+    "text": "Positive sentiment: executive sponsor praised the collaboration and highlighted faster reporting for the operating team.",
+    "synthetic": true
+  }
+]
