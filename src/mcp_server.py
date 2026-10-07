@@ -24,4 +24,3 @@ def get_customer_by_id(customer_id: int) -> dict:
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")
-
